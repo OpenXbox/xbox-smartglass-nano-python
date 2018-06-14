@@ -1,19 +1,19 @@
 language: python
 python:
-  - '3.5'
-  - '3.6'
-  - 'pypy3.5'
+- '3.5'
+- '3.6'
+- pypy3.5
 install:
-  - pip install -U tox-travis
-  - pip install -e .[dev]
-  - python setup.py develop
+- pip install -U tox-travis
+- pip install -e .[dev]
+- python setup.py develop
 script: tox
 deploy:
   provider: pypi
   distributions: sdist bdist_wheel
   user: OpenXbox
   password:
-    secure: 
+    secure: VMlroGHlsmc7PHiQaYr0Z1LVAh5d0VI8izDhLZRUSuusdgKYLZ8pHJc1W0M9+4/dz8md32P0+8ofYcpFZjlM8fyxzRv5DXoHQVD5CGoXDkjzX7qdwaKcPIKfjjAqyyDqcVtkaaIHvZ/Cu7GsdJDa3aqmcdofoHJYWV7VWkcUmHl4Aengo3l08Z4FynzYxKmqstZDtMXMkayoZ/NqCZXZX6apbduhZ0KW8L/9fYi7vev2XEz1bgtStoUegvA7vbpfXAGRwfgScj4TEEqmUEe/9kr5jyZLX8p7qlcAGid6O5Q+TwIqSYPIOHc/bJXvcLcjcUWXafUaKpEKhEvG6+M6OEaroJFTWfkbIyIhTUgDPO2GuZ641PHlZpAdl/SVit6KqZ0LH8d9KLgU6ekO55zVzUSTAGiXNYqdRiZQAHqWUUF6sW4y49a5wPLruDzCwtvajRvniHviTOlG80svd/X7HCAsDyqF45i2+kdg8d4mWM/7LP4jlWB9to9LhSKxd7bOEmbdfu/dlIMhRUaf7tAStm93RCVqbrnL4rOmqlLwivh1VUktjB1iv7P7egfyuq48c0VmGGFcfNd8pwoJPyf9Mp2ZXLW7tJOtN6TrQR03KNyztqJkBdMl07gwF4apQ8IzMM70Zyg6FM0y3obJEbfRRjHJ3kMn13s/g8WpuCtiAxw=
   on:
     tags: true
     branch: master
