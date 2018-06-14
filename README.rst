@@ -20,7 +20,7 @@ Xbox-Smartglass-Nano
 The gamestreaming part of the smartglass library
 
 
-For in-depth information, check out the documentation: *TODO* fill final URL *TODO*
+For in-depth information, check out the documentation: (https://openxbox.github.io)
 
 Dependencies
 ------------
