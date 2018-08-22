@@ -15,13 +15,7 @@ setup(
     url="https://github.com/OpenXbox/xbox-smartglass-nano-python",
     packages=[
         'xbox.nano',
-        'xbox.nano.render',
-        'xbox.nano.scripts',
-        'xbox.nano.packet',
-        'xbox.nano.factory',
-        'xbox.nano.render.video',
-        'xbox.nano.render.input',
-        'xbox.nano.render.audio'
+        'xbox.nano.packet'
     ],
     namespace_packages=['xbox'],
     zip_safe=False,
@@ -41,7 +35,7 @@ setup(
         'marshmallow-objects',
         'marshmallow-enum'
     ],
-    tests_requires=[
+    tests_require=[
         'pytest',
         'flake8',
         'tox'
@@ -49,9 +43,6 @@ setup(
     test_suite="tests",
     entry_points={
         'console_scripts': [
-            'xbox-nano-client=xbox.nano.scripts.client:main',
-            'xbox-nano-pcap=xbox.nano.scripts.pcap:main',
-            'xbox-nano-replay=xbox.nano.scripts.replay:main'
         ]
     }
 )
