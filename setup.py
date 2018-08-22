@@ -30,8 +30,6 @@ setup(
     ],
     install_requires=[
         'xbox-smartglass-core>=1.0.10',
-        'av==0.4.1',
-        'PySDL2',
         'marshmallow-objects',
         'marshmallow-enum'
     ],
