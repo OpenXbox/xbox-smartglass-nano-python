@@ -38,7 +38,7 @@ Install::
 
 Usage::
 
-  xboxnano_client
+  xbox-nano-client
 
 Known issues
 ------------

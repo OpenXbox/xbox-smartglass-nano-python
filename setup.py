@@ -35,7 +35,7 @@ setup(
         "Programming Language :: Python :: 3.6"
     ],
     install_requires=[
-        'xbox-smartglass-core>=1.0.8',
+        'xbox-smartglass-core>=1.0.10',
         'av==0.4.1',
         'PySDL2',
         'marshmallow-objects',

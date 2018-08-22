@@ -1,0 +1,7 @@
+{
+  "type": 4,
+  "enabled": true,
+  "canBeEnabled": true,
+  "majorProtocolVersion": 6,
+  "minorProtocolVersion": 0
+}
