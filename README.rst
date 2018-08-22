@@ -14,7 +14,7 @@ Xbox-Smartglass-Nano
     :target: https://travis-ci.com/OpenXbox/xbox-smartglass-nano-python
 
 .. image:: https://img.shields.io/badge/discord-OpenXbox-blue.svg
-    :target: https://discord.gg/uzbC73m
+    :target: https://discord.gg/E8kkJhQ
     :alt: Discord chat channel
 
 The gamestreaming part of the smartglass library
