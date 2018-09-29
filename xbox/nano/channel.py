@@ -127,7 +127,8 @@ class VideoChannel(Channel):
             initial_frame_id=self.generate_initial_frame_id(),
             requested_format=video_format
         )
-        self.client.set_video_format(video_format)
+        # You could set initial video format here
+        # self.client.set_video_format(video_format)
         self.send_tcp_streamer(VideoPayloadType.ClientHandshake, payload)
 
     def on_server_handshake(self, msg):
