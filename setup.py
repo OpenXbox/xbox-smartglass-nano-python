@@ -6,7 +6,7 @@ from setuptools import setup
 
 setup(
     name="xbox-smartglass-nano",
-    version="0.9.0",
+    version="0.9.1",
     author="OpenXbox",
     description="The NANO part of the xbox smartglass library",
     long_description=open('README.rst').read() + '\n\n' + open('HISTORY.rst').read(),
