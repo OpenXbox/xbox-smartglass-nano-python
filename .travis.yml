@@ -24,6 +24,10 @@ addons:
       - libavcodec-dev
       - libavformat-dev
       - libavutil-dev
+      - libavdevice-dev
+      - libavfilter-dev
+      - libswscale-dev
+      - libavresample-dev
       - libsdl2-dev
 script: tox
 deploy:
