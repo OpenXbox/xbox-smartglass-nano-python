@@ -2,7 +2,7 @@ import os
 import pytest
 import json
 
-# from xbox.nano.channel import Channel
+from xbox.nano.channel import Channel
 from xbox.nano.enum import ChannelClass
 
 
@@ -29,7 +29,7 @@ def json_messages():
 
     return data
 
-"""
+
 @pytest.fixture(scope='session')
 def channels():
     return {
@@ -41,5 +41,3 @@ def channels():
         1028: Channel(None, None, 1028, ChannelClass.Input, 0),
         1029: Channel(None, None, 1029, ChannelClass.InputFeedback, 0)
     }
-"""
-

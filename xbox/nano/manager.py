@@ -3,7 +3,7 @@ from xbox.sg.manager import Manager
 from xbox.sg.enum import ServiceChannel
 
 from xbox.nano.packet import json
-# from xbox.nano.protocol import NanoProtocol
+from xbox.nano.protocol import NanoProtocol
 from xbox.nano.enum import GameStreamState, BroadcastMessageType
 
 log = logging.getLogger(__name__)
@@ -97,7 +97,6 @@ class NanoManager(Manager):
         self._send_json(msg.dump())
 
     def start_gamestream(self, client):
-        """
         if not self.streaming:
             raise NanoManagerError('start_gamestream: Connection params not ready')
 
@@ -107,8 +106,6 @@ class NanoManager(Manager):
         self._protocol.start()
         self._protocol.connect()
         self._connected = True
-        """
-        pass
 
     def _on_json(self, data, service_channel):
         msg = json.parse(data)
