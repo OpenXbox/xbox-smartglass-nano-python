@@ -7,6 +7,24 @@ install:
 - pip install -U tox-travis
 - pip install -e .[dev]
 - python setup.py develop
+addons:
+  apt:
+    sources:
+      - trusty
+    packages:
+      - autoconf
+      - automake
+      - autotools-dev
+      - build-essential
+      - debhelper
+      - dh-autoreconf
+      - dpkg-dev
+      - libtool
+      - libvorbis-dev
+      - libavcodec-dev
+      - libavformat-dev
+      - libavutil-dev
+      - libsdl2-dev
 script: tox
 deploy:
   provider: pypi
