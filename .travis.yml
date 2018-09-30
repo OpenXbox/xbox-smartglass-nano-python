@@ -13,15 +13,7 @@ addons:
       - trusty
       - trusty-media
     packages:
-      - autoconf
-      - automake
-      - autotools-dev
-      - build-essential
-      - debhelper
-      - dh-autoreconf
-      - dpkg-dev
-      - libtool
-      - libvorbis-dev
+      - pkg-config
       - libavcodec-dev
       - libavformat-dev
       - libavutil-dev
