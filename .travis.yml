@@ -7,6 +7,22 @@ install:
 - pip install -U tox-travis
 - pip install -e .[dev]
 - python setup.py develop
+addons:
+  apt:
+    sources:
+      - trusty
+      - sourceline: 'ppa:jonathonf/ffmpeg-3'
+    packages:
+      - pkg-config
+      - libavcodec-dev
+      - libavformat-dev
+      - libavutil-dev
+      - libavdevice-dev
+      - libavfilter-dev
+      - libswscale-dev
+      - libswresample-dev
+      - ffmpeg
+      - libsdl2-dev
 script: tox
 deploy:
   provider: pypi
