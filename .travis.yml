@@ -11,7 +11,7 @@ addons:
   apt:
     sources:
       - trusty
-      - trusty-media
+      - sourceline: 'ppa:jonathonf/ffmpeg-3'
     packages:
       - pkg-config
       - libavcodec-dev
@@ -20,7 +20,7 @@ addons:
       - libavdevice-dev
       - libavfilter-dev
       - libswscale-dev
-      - libavresample-dev
+      - libswresample-dev
       - ffmpeg
       - libsdl2-dev
 script: tox
