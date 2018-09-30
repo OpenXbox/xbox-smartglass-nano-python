@@ -21,6 +21,7 @@ addons:
       - libavfilter-dev
       - libswscale-dev
       - libavresample-dev
+      - ffmpeg
       - libsdl2-dev
 script: tox
 deploy:
