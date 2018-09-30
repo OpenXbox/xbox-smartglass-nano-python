@@ -19,6 +19,7 @@ setup(
         'xbox.nano.scripts',
         'xbox.nano.packet',
         'xbox.nano.factory',
+        'xbox.nano.render.client',
         'xbox.nano.render.video',
         'xbox.nano.render.input',
         'xbox.nano.render.audio'
