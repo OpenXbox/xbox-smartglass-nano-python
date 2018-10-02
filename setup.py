@@ -9,7 +9,8 @@ setup(
     version="0.9.2",
     author="OpenXbox",
     description="The NANO part of the xbox smartglass library",
-    long_description=open('README.rst').read() + '\n\n' + open('HISTORY.rst').read(),
+    long_description=open('README.rst').read() +
+    '\n\n' + open('HISTORY.rst').read(),
     license="GPL",
     keywords="xbox one smartglass nano gamestreaming",
     url="https://github.com/OpenXbox/xbox-smartglass-nano-python",
@@ -26,6 +27,7 @@ setup(
     ],
     namespace_packages=['xbox'],
     zip_safe=False,
+    include_package_data=True,
     classifiers=[
         "Development Status :: 4 - Beta",
         "Intended Audience :: Developers",
@@ -54,5 +56,5 @@ setup(
             'xbox-nano-pcap=xbox.nano.scripts.pcap:main',
             'xbox-nano-replay=xbox.nano.scripts.replay:main'
         ]
-    }
+    },
 )
