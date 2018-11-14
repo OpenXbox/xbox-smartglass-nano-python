@@ -12,7 +12,7 @@ install:
 addons:
   apt:
     sources:
-      - trusty
+      - xenial
       - sourceline: 'ppa:jonathonf/ffmpeg-3'
     packages:
       - pkg-config
