@@ -94,6 +94,15 @@ class InputHandler(Sink):
             self._frame(**{field_name: 0})
 
     def open(self, client):
+        """
+        Initialize the input handler with a NanoClient instance
+
+        Args:
+            client (:class:`xbox.nano.protocol.NanoProtocol`): Instance of :class:`NanoProtocol`
+
+        Returns:
+            None
+        """
         self.client = client
 
     def send_frame(self):
@@ -106,6 +115,16 @@ class InputHandler(Sink):
         self.client.controller_removed(controller_index)
 
     def set_button(self, button, state):
+        """
+        Set controller button state
+
+        Args:
+            button (:class:`GamepadButton`): Member of :class:`GamepadButton`
+            state (:class:`GamepadButtonState`): Member of :class:`GamepadButtonState`
+
+        Returns:
+            None
+        """
         field_name = FRAME_MAPPING[button]
         current_val = getattr(self._frame, field_name)
 
@@ -118,16 +137,26 @@ class InputHandler(Sink):
             return
 
         log.debug('Button: %s - %s' % (
-            GamepadButton[button], GamepadButtonState[state]
+            GamepadButton(button), GamepadButtonState(state)
         ))
 
         self._frame(**{field_name: current_val + 1})
         self.send_frame()
 
     def set_axis(self, axis, value):
+        """
+        Set controller analog axis value
+
+        Args:
+            axis (:class:`GamepadAxis`): Member of :class:`GamepadAxis`
+            value (int): Axis position
+
+        Returns:
+            None
+        """
         field_name = FRAME_MAPPING[axis]
 
-        log.debug('Axis move: %s - Value: %i' % (GamepadAxis[axis], value))
+        log.debug('Axis move: %s - Value: %i' % (GamepadAxis(axis), value))
 
         self._frame(**{field_name: value})
         self.send_frame()
