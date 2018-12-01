@@ -4,7 +4,7 @@ from xbox.nano.enum import VideoCodec, AudioCodec
 
 class FrameDecoder(object):
     def __init__(self, codec_name):
-        self._decoder = av.codec.CodecContext.create(codec_name, 'r')
+        self._decoder = av.Codec(codec_name, 'r').create()
 
     @classmethod
     def video(cls, codec_id):

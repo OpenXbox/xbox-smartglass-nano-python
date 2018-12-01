@@ -77,9 +77,9 @@ class SDLVideoRenderer(Sink):
                 intp = POINTER(c_ubyte)
                 sdl2.SDL_UpdateYUVTexture(
                     self._texture, None,
-                    cast(frame.planes[0].ptr, intp), frame.planes[0].line_size,
-                    cast(frame.planes[1].ptr, intp), frame.planes[1].line_size,
-                    cast(frame.planes[2].ptr, intp), frame.planes[2].line_size,
+                    cast(frame.planes[0].buffer_ptr, intp), frame.planes[0].line_size,
+                    cast(frame.planes[1].buffer_ptr, intp), frame.planes[1].line_size,
+                    cast(frame.planes[2].buffer_ptr, intp), frame.planes[2].line_size,
                 )
                 self._lock.release()
                 sdl2.SDL_RenderClear(renderer)
