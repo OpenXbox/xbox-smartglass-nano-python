@@ -13,8 +13,7 @@ install:
 addons:
   apt:
     sources:
-      - xenial
-      - sourceline: 'ppa:jonathonf/ffmpeg-3'
+      - sourceline: 'ppa:jonathonf/ffmpeg-4'
     packages:
       - pkg-config
       - libavcodec-dev
