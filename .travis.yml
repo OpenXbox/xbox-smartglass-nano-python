@@ -13,25 +13,25 @@ install:
 addons:
   apt:
     sources:
-      - sourceline: 'ppa:jonathonf/ffmpeg-4'
+    - sourceline: ppa:jonathonf/ffmpeg-4
     packages:
-      - pkg-config
-      - libavcodec-dev
-      - libavformat-dev
-      - libavutil-dev
-      - libavdevice-dev
-      - libavfilter-dev
-      - libswscale-dev
-      - libswresample-dev
-      - ffmpeg
-      - libsdl2-dev
+    - pkg-config
+    - libavcodec-dev
+    - libavformat-dev
+    - libavutil-dev
+    - libavdevice-dev
+    - libavfilter-dev
+    - libswscale-dev
+    - libswresample-dev
+    - ffmpeg
+    - libsdl2-dev
 script: tox
 deploy:
   provider: pypi
   distributions: sdist bdist_wheel
-  user: OpenXbox
+  user: "__token__"
   password:
-    secure: XMtNkusTgKmoLTv5vVC7M8Uu6w+lGy7ofzYQE2votfp0EbhH7Ra/e0KKSzLwZHGCe4kGSmw3/umaKw7ShCi12spk+pRbkRMMCQfDh57PgKKcfE7h1nX9c6VWdENzIFxYDdJA2DWbKrg0R5PbpfbusCvXN0ckL3ZFnCLuutXok2jgj6cPyMGTObGXy5WID2I2lmpKMKVapjIXFqem78LXnfz5KtkgOT3dvwJwH3CnilioZgmpi010MAit8O+eRGhV3UqYbOno7uVZ/CEBxU3CCBQNX0d3G0eMBFKjOLbXJCjHFPEEHl5TBtaKtugqE1vDojBJrDDNvc4Hgs3S9RmEFmV0kDSoiCvaBJhfIyvWiwG3DVHWsGdpl3d8oAjdrtOFb2Rg0Bl383u9DMj8TjLFfeFLvm4tcVPw3Fzt49M83YvoCcQAWGMt2mbjO+17regDZ/DDKm4OxsVWZhNICRpfcLp22BMcDsfP+aGPxw5ykLbnZ6b5FwV6FcUqucbSWB00fW37A3KcPhUhY/e8hQfgvIvsC9rrBL4Qc+fL1Mp8eHknccqa1dK7yjneyoxDruqBKSdd5R5bDU1MsC1nInNuQ5cmrPT+al6DxYFnGCSUu2AhWbbOhQZOSTqghdZWDlX5tLz/ZLAHFeub2gc0uRlmo8MRcrl8aXX42sS61nU39Rw=
+    secure: "na/wyeOxIPodl2p73SuwHloqQg7DHh46PcoASzy4i31kscSZn3LdWxTZyDcRxojStcw9K7XmviiZ8UVpBmcHMQVX6H07s4nKyjEuUdEUhiH6+OfH0w3jSa5OY2ZPA7h7hmbYmBYf9IxHR1FBgXP/fGwcLaPTewXMv5Owh8epIC7v8RC1ZK2nsbzudTIY1i7fmjlMuHB17mIcpmp+1bakHWD9T56pK+7K9yP4akjr48hK7MVlB4BK3PygluMKj33wV6yEh2nl2ohNpVatmluO3Ap2S5G9aiU2nj83Q4SVsRj/zwYGjo5Tn9yqfie75R6I8AxaW7sosDXiONuotlZl/1sKrT3CjeLQBPvU1qs97dKktmEDd70aEziRyrB9MqKBMTO/G9itAXhJsdfOdpQu/V0ToaeYAUkSH71lyKzm8+I0G3Qe9Kes8+1bxZTBVdQim0cjPwSpDf7PgSWlcgLvFmJckzw7fXkwMH7AnIK8iLrcHNr45y4dD6g3jE2HgTPbLz954QQDLOYI6lrs7Z7f10vkzLoumDC+oplZvj54D+5uA3pkLxO+kDZFYkMkOsDdmHdFUoo48FZzOhRu7z8fv3dPFnXAWRdoAbS4db3YdE2fZLq+n+hFmpyb2qhLijOc39oMBQFbbWiaGF72Alox1avvQYkh69BXUysl4xvS6T8="
   on:
     tags: true
     branch: master
