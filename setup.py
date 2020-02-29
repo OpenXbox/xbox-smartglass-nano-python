@@ -10,6 +10,7 @@ setup(
     author="OpenXbox",
     description="The NANO part of the xbox smartglass library",
     long_description=open('README.rst').read() + '\n\n' + open('HISTORY.rst').read(),
+    long_description_content_type="text/x-rst",
     license="GPL",
     keywords="xbox one smartglass nano gamestreaming",
     url="https://github.com/OpenXbox/xbox-smartglass-nano-python",
