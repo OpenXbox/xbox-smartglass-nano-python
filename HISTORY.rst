@@ -2,6 +2,12 @@
 History
 =======
 
+0.9.4 (2020-02-29)
+------------------
+
+* Fix KeyError for debug prints
+* PyAV 0.4.1 -> 6.1.0 compatibility
+
 0.9.3 (2018-11-14)
 ------------------
 
