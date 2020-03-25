@@ -23,7 +23,7 @@ frame_ack = XStruct(
 )
 
 
-input_frame_buttons = XStruct(
+input_frame_buttons = Struct(
     'dpad_up' / Default(Byte, 0),
     'dpad_down' / Default(Byte, 0),
     'dpad_left' / Default(Byte, 0),
@@ -43,7 +43,7 @@ input_frame_buttons = XStruct(
 )
 
 
-input_frame_analog = XStruct(
+input_frame_analog = Struct(
     'left_trigger' / Default(Byte, 0),
     'right_trigger' / Default(Byte, 0),
     'left_thumb_x' / Default(Int16ub, 0),
@@ -57,7 +57,7 @@ input_frame_analog = XStruct(
 )
 
 
-input_frame_extension = XStruct(
+input_frame_extension = Struct(
     'byte_6' / Default(Byte, 0),  # always 1 for gamepad stuff?
     'byte_7' / Default(Byte, 0),
     'rumble_trigger_l2' / Default(Byte, 0),
@@ -74,8 +74,8 @@ frame = XStruct(
     'frame_id' / Int32ul,
     'timestamp' / Int64ul,
     'created_ts' / Int64ul,
-    'buttons' / input_frame_buttons,
-    'analog' / input_frame_analog,
+    'buttons' / Bytes(16),
+    'analog' / Bytes(14),
     # Check if remaining length is at least 9
-    'extension' / input_frame_extension
+    'extension' / Bytes(9)
 )

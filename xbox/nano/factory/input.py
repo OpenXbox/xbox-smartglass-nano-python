@@ -1,3 +1,4 @@
+import construct
 from xbox.nano.packet import input
 
 

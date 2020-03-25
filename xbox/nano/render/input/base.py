@@ -3,7 +3,7 @@ from enum import Enum
 from datetime import datetime
 
 from xbox.nano.render.sink import Sink
-from xbox.nano.packet.input import frame
+from xbox.nano.packet.input import frame, input_frame_buttons, input_frame_analog, input_frame_extension
 
 log = logging.getLogger(__name__)
 
@@ -48,7 +48,7 @@ class GamepadFeedback(Enum):
     RightHandleRumble = 33
 
 
-FRAME_MAPPING = {
+FRAME_MAPPING_BUTTONS = {
     GamepadButton.DPadUp: 'dpad_up',
     GamepadButton.DPadDown: 'dpad_down',
     GamepadButton.DPadLeft: 'dpad_left',
@@ -65,7 +65,9 @@ FRAME_MAPPING = {
     GamepadButton.B: 'b',
     GamepadButton.X: 'x',
     GamepadButton.Y: 'y',
+}
 
+FRAME_MAPPING_ANALOG = {
     GamepadAxis.LeftTrigger: 'left_trigger',
     GamepadAxis.RightTrigger: 'right_trigger',
     GamepadAxis.LeftThumbstick_X: 'left_thumb_x',
@@ -87,11 +89,10 @@ class InputError(Exception):
 class InputHandler(Sink):
     def __init__(self):
         self.client = None
-        self._frame = frame(byte_6=1)
 
-        # Set all values to zero
-        for field_name in FRAME_MAPPING.values():
-            self._frame(**{field_name: 0})
+        # Cache for button states
+        self._button_states = {k: 0 for k in FRAME_MAPPING_BUTTONS.values()}
+        self._analog_states = {k: 0 for k in FRAME_MAPPING_ANALOG.values()}
 
     def open(self, client):
         """
@@ -106,7 +107,12 @@ class InputHandler(Sink):
         self.client = client
 
     def send_frame(self):
-        self.client.send_input(self._frame, datetime.utcnow())
+        packet = frame(
+            buttons=input_frame_buttons.build(self._button_states),
+            analog=input_frame_analog.build(self._analog_states),
+            extension=input_frame_extension.build(dict(byte_6=1))
+        )
+        self.client.send_input(packet, datetime.utcnow())
 
     def controller_added(self, controller_index):
         self.client.controller_added(controller_index)
@@ -125,8 +131,8 @@ class InputHandler(Sink):
         Returns:
             None
         """
-        field_name = FRAME_MAPPING[button]
-        current_val = getattr(self._frame, field_name)
+        field_name = FRAME_MAPPING_BUTTONS[button]
+        current_val = self._button_states[field_name]
 
         if current_val == 0 or (current_val % 2) == 0:
             current_state = GamepadButtonState.Released
@@ -140,7 +146,8 @@ class InputHandler(Sink):
             GamepadButton(button), GamepadButtonState(state)
         ))
 
-        self._frame(**{field_name: current_val + 1})
+        # Cache button state
+        self._button_states[field_name] = current_val + 1
         self.send_frame()
 
     def set_axis(self, axis, value):
@@ -154,9 +161,9 @@ class InputHandler(Sink):
         Returns:
             None
         """
-        field_name = FRAME_MAPPING[axis]
+        field_name = FRAME_MAPPING_ANALOG[axis]
 
         log.debug('Axis move: %s - Value: %i' % (GamepadAxis(axis), value))
 
-        self._frame(**{field_name: value})
+        self._analog_states[field_name] = value
         self.send_frame()
