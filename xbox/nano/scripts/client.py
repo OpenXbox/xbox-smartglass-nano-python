@@ -50,7 +50,7 @@ def main():
         console.nano.start_stream()
         console.wait(2)
 
-        client = SDLClient(1280, 720)
+        client = SDLClient(1280, 720, True)
         console.nano.start_gamestream(client)
 
         try:

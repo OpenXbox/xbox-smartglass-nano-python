@@ -66,14 +66,24 @@ class SDLKeyboardInputHandler(InputHandler):
                     self._open_controller()
 
                 button = event.key.keysym.sym
+                gamepad_button = SDL_BUTTON_MAP.get(button, None)
+                if not gamepad_button:
+                    LOGGER.debug('Input key {} not supported'.format(button))
+                    break
+
                 self.set_button(
-                    SDL_BUTTON_MAP[button], GamepadButtonState.Pressed
+                    gamepad_button, GamepadButtonState.Pressed
                 )
 
             elif event.type == sdl2.SDL_KEYUP:
                 button = event.key.keysym.sym
+                gamepad_button = SDL_BUTTON_MAP.get(button, None)
+                if not gamepad_button:
+                    LOGGER.debug('Input key {} not supported'.format(button))
+                    break
+
                 self.set_button(
-                    SDL_BUTTON_MAP[button], GamepadButtonState.Released
+                    gamepad_button, GamepadButtonState.Released
                 )
 
             """

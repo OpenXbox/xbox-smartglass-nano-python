@@ -2,6 +2,7 @@ import time
 import random
 import logging
 from collections import deque
+from datetime import datetime
 
 from xbox.nano import factory
 from xbox.nano.packet import audio
@@ -49,11 +50,8 @@ class Channel(object):
         log.debug("%s - Set Reference timestamp: %s", self.name, self._ref_timestamp)
 
     def generate_reference_timestamp(self):
-        self.reference_timestamp = int(time.time() * 1000)
+        self.reference_timestamp = datetime.utcnow()
         return self.reference_timestamp
-
-    def generate_timestamp(self):
-        return int(time.time() * 1000) - self.reference_timestamp
 
     @property
     def frame_id(self):
@@ -272,6 +270,16 @@ class ChatAudioChannel(Channel):
 
 
 class InputChannel(Channel):
+    def get_input_timestamp_from_dt(self, datetime_obj):
+        """
+        Nanoseconds (1/1000000)s
+        """
+        delta = (datetime_obj - self.reference_timestamp)
+        return int(delta.total_seconds() * 100000)
+
+    def get_input_timestamp_now(self):
+        return self.get_input_timestamp_from_dt(datetime.utcnow())
+
     def on_message(self, msg):
         if InputPayloadType.ServerHandshake == msg.header.streamer.type:
             self.on_server_handshake(msg)
@@ -301,11 +309,11 @@ class InputChannel(Channel):
     def on_frame_ack(self, msg):
         log.debug("Acked InputFrame: %s", msg.payload.acked_frame)
 
-    def send_frame(self, input_frame, created_ts):
+    def send_frame(self, input_frame, created_dt):
         input_frame = input_frame(
             frame_id=self.next_frame_id,
-            timestamp=self.generate_timestamp(),
-            created_ts=created_ts
+            timestamp=self.get_input_timestamp_now(),
+            created_ts=self.get_input_timestamp_from_dt(created_dt)
         )
         log.debug("Sending Input Frame msg: %s", input_frame)
         self.send_udp_streamer(InputPayloadType.Frame, input_frame)

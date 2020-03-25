@@ -3,6 +3,7 @@ from construct import *
 from xbox.nano.enum import VideoCodec
 from xbox.sg.utils.struct import XStruct
 from xbox.sg.utils.adapters import XEnum, PrefixedBytes
+from xbox.nano.adapters import ReferenceTimestampAdapter
 
 
 fmt = XStruct(
@@ -25,7 +26,7 @@ server_handshake = XStruct(
     'width' / Int32ul,
     'height' / Int32ul,
     'fps' / Int32ul,
-    'reference_timestamp' / Int64ul,
+    'reference_timestamp' / ReferenceTimestampAdapter(),
     'formats' / PrefixedArray(Int32ul, fmt)
 )
 

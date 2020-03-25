@@ -1,6 +1,6 @@
-import time
 import logging
 from enum import Enum
+from datetime import datetime
 
 from xbox.nano.render.sink import Sink
 from xbox.nano.packet.input import frame
@@ -106,7 +106,7 @@ class InputHandler(Sink):
         self.client = client
 
     def send_frame(self):
-        self.client.send_input(self._frame, int(time.time()))
+        self.client.send_input(self._frame, datetime.utcnow())
 
     def controller_added(self, controller_index):
         self.client.controller_added(controller_index)

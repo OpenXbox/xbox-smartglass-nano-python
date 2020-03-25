@@ -1,7 +1,7 @@
 # flake8: noqa
 from construct import *
 from xbox.sg.utils.struct import XStruct
-
+from xbox.nano.adapters import ReferenceTimestampAdapter
 
 server_handshake = XStruct(
     'protocol_version' / Int32ul,
@@ -14,7 +14,7 @@ server_handshake = XStruct(
 
 client_handshake = XStruct(
     'max_touches' / Int32ul,
-    'reference_timestamp' / Int64ul
+    'reference_timestamp' / ReferenceTimestampAdapter()
 )
 
 
