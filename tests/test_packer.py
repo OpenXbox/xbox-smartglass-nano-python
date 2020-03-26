@@ -312,10 +312,10 @@ def test_input_frame(packets, channels):
     assert unpacked.payload.buttons.y == 0
     assert unpacked.payload.analog.left_trigger == 0
     assert unpacked.payload.analog.right_trigger == 0
-    assert unpacked.payload.analog.left_thumb_x == 55302
-    assert unpacked.payload.analog.left_thumb_y == 44034
-    assert unpacked.payload.analog.right_thumb_x == 14340
-    assert unpacked.payload.analog.right_thumb_y == 61952
+    assert unpacked.payload.analog.left_thumb_x == 1752
+    assert unpacked.payload.analog.left_thumb_y == 684
+    assert unpacked.payload.analog.right_thumb_x == 1080
+    assert unpacked.payload.analog.right_thumb_y == 242
     assert unpacked.payload.analog.rumble_trigger_l == 0
     assert unpacked.payload.analog.rumble_trigger_r == 0
     assert unpacked.payload.analog.rumble_handle_l == 0

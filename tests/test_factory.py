@@ -763,10 +763,10 @@ def test_input_frame(packets, channels):
     analog = packet.input.input_frame_analog(
         left_trigger=0,
         right_trigger=0,
-        left_thumb_x=55302,
-        left_thumb_y=44034,
-        right_thumb_x=14340,
-        right_thumb_y=61952,
+        left_thumb_x=1752,
+        left_thumb_y=684,
+        right_thumb_x=1080,
+        right_thumb_y=242,
         rumble_trigger_l=0,
         rumble_trigger_r=0,
         rumble_handle_l=0,
@@ -827,10 +827,10 @@ def test_input_frame(packets, channels):
     assert msg.payload.buttons.y == 0
     assert msg.payload.analog.left_trigger == 0
     assert msg.payload.analog.right_trigger == 0
-    assert msg.payload.analog.left_thumb_x == 55302
-    assert msg.payload.analog.left_thumb_y == 44034
-    assert msg.payload.analog.right_thumb_x == 14340
-    assert msg.payload.analog.right_thumb_y == 61952
+    assert msg.payload.analog.left_thumb_x == 1752
+    assert msg.payload.analog.left_thumb_y == 684
+    assert msg.payload.analog.right_thumb_x == 1080
+    assert msg.payload.analog.right_thumb_y == 242
     assert msg.payload.analog.rumble_trigger_l == 0
     assert msg.payload.analog.rumble_trigger_r == 0
     assert msg.payload.analog.rumble_handle_l == 0
