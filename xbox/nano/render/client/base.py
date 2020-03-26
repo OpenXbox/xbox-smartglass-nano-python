@@ -56,10 +56,10 @@ class Client(object):
     def render_audio(self, data):
         self.audio.render(data)
 
-    def send_input(self, frame, timestamp):
+    def send_input(self, frame, timestamp_dt):
         input_channel = self.protocol.get_channel(ChannelClass.Input)
-        if input_channel:
-            input_channel.send_frame(frame, timestamp)
+        if input_channel and input_channel.reference_timestamp:
+            input_channel.send_frame(frame, timestamp_dt)
 
     def controller_added(self, controller_index):
         control_channel = self.protocol.get_channel(ChannelClass.Control)

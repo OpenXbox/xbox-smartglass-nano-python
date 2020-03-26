@@ -3,7 +3,7 @@ from construct import *
 from xbox.sg.utils.struct import XStruct
 from xbox.sg.utils.adapters import XEnum, PrefixedBytes
 from xbox.nano.enum import AudioCodec
-
+from xbox.nano.adapters import ReferenceTimestampAdapter
 
 fmt = XStruct(
     'channels' / Int32ul,
@@ -18,7 +18,7 @@ fmt = XStruct(
 
 server_handshake = XStruct(
     'protocol_version' / Int32ul,
-    'reference_timestamp' / Int64ul,
+    'reference_timestamp' / ReferenceTimestampAdapter(),
     'formats' / PrefixedArray(Int32ul, fmt)
 )
 
