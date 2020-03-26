@@ -1,3 +1,4 @@
+import datetime
 from binascii import hexlify
 
 from xbox.nano import packer, enum
@@ -127,7 +128,7 @@ def test_audio_server_handshake(packets, channels):
     assert unpacked.header.streamer.type == enum.AudioPayloadType.ServerHandshake
 
     assert unpacked.payload.protocol_version == 4
-    assert unpacked.payload.reference_timestamp == 1495315092424
+    assert unpacked.payload.reference_timestamp == datetime.datetime.utcfromtimestamp(1495315092424 / 1000)
     assert len(unpacked.payload.formats) == 1
     assert unpacked.payload.formats[0].channels == 2
     assert unpacked.payload.formats[0].sample_rate == 48000
@@ -190,7 +191,7 @@ def test_video_server_handshake(packets, channels):
     assert unpacked.payload.width == 1280
     assert unpacked.payload.height == 720
     assert unpacked.payload.fps == 30
-    assert unpacked.payload.reference_timestamp == 1495315092425
+    assert unpacked.payload.reference_timestamp == datetime.datetime.utcfromtimestamp(1495315092425 / 1000)
     assert len(unpacked.payload.formats) == 4
 
     assert unpacked.payload.formats[0].fps == 30
@@ -254,7 +255,7 @@ def test_input_client_handshake(packets, channels):
     assert unpacked.header.streamer.type == enum.InputPayloadType.ClientHandshake
 
     assert unpacked.payload.max_touches == 10
-    assert unpacked.payload.reference_timestamp == 1498690645999
+    assert unpacked.payload.reference_timestamp == datetime.datetime.utcfromtimestamp(1498690645999 / 1000)
 
 
 def test_input_server_handshake(packets, channels):

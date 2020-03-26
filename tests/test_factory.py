@@ -1,3 +1,4 @@
+import datetime
 from binascii import unhexlify
 from construct import Container
 
@@ -304,9 +305,10 @@ def test_audio_server_handshake(packets, channels):
     data = packets['tcp_audio_server_handshake']
 
     format = packet.audio.fmt(channels=2, sample_rate=48000, codec=1)
+    ref_ts = datetime.datetime.utcfromtimestamp(1495315092424 / 1000)
 
     payload = factory.audio.server_handshake(
-        protocol_version=4, reference_timestamp=1495315092424,
+        protocol_version=4, reference_timestamp=ref_ts,
         formats=[format.container]
     )
     msg = factory.streamer_tcp(
@@ -331,7 +333,7 @@ def test_audio_server_handshake(packets, channels):
     assert msg.header.streamer.type == enum.AudioPayloadType.ServerHandshake
 
     assert msg.payload.protocol_version == 4
-    assert msg.payload.reference_timestamp == 1495315092424
+    assert msg.payload.reference_timestamp == ref_ts
     assert len(msg.payload.formats) == 1
     assert msg.payload.formats[0].channels == 2
     assert msg.payload.formats[0].sample_rate == 48000
@@ -465,6 +467,8 @@ def test_video_client_handshake(packets, channels):
 def test_video_server_handshake(packets, channels):
     data = packets['tcp_video_server_handshake']
 
+    ref_ts = datetime.datetime.utcfromtimestamp(1495315092425 / 1000)
+
     formats = [
         packet.video.fmt(fps=30, width=1280, height=720, codec=0).container,
         packet.video.fmt(fps=30, width=960, height=540, codec=0).container,
@@ -474,7 +478,7 @@ def test_video_server_handshake(packets, channels):
 
     payload = factory.video.server_handshake(
         protocol_version=5, width=1280, height=720, fps=30,
-        reference_timestamp=1495315092425, formats=formats)
+        reference_timestamp=ref_ts, formats=formats)
     msg = factory.streamer_tcp(
         sequence_num=1, prev_sequence_num=0,
         payload_type=enum.VideoPayloadType.ServerHandshake,
@@ -500,7 +504,7 @@ def test_video_server_handshake(packets, channels):
     assert msg.payload.width == 1280
     assert msg.payload.height == 720
     assert msg.payload.fps == 30
-    assert msg.payload.reference_timestamp == 1495315092425
+    assert msg.payload.reference_timestamp == ref_ts
     assert len(msg.payload.formats) == 4
 
     assert msg.payload.formats[0].fps == 30
@@ -633,8 +637,10 @@ def test_video_data(packets, channels):
 def test_input_client_handshake(packets, channels):
     data = packets['tcp_input_client_handshake']
 
+    ref_ts = datetime.datetime.utcfromtimestamp(1498690645999 / 1000)
+
     payload = factory.input.client_handshake(
-        max_touches=10, reference_timestamp=1498690645999
+        max_touches=10, reference_timestamp=ref_ts
     )
     msg = factory.streamer_tcp(
         sequence_num=1, prev_sequence_num=0,
@@ -658,7 +664,7 @@ def test_input_client_handshake(packets, channels):
     assert msg.header.streamer.type == enum.InputPayloadType.ClientHandshake
 
     assert msg.payload.max_touches == 10
-    assert msg.payload.reference_timestamp == 1498690645999
+    assert msg.payload.reference_timestamp == ref_ts
 
     assert len(packed) == len(data)
     assert packed == data

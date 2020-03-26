@@ -14,9 +14,9 @@ class ReferenceTimestampAdapter(construct.Adapter):
     def _encode(self, obj, context, path):
         if not isinstance(obj, datetime):
             raise TypeError('Object not of type datetime')
-        # Timestamp in microseconds since epoch (uint64 LE)
-        return int(obj.timestamp() * 1000)
+        # Timestamp in milliseconds since epoch (uint64 LE)
+        return int((obj - datetime.utcfromtimestamp(0)).total_seconds() * 1000.0)
 
     def _decode(self, obj, context, path):
-        # Convert from microsecond since epoch to datetime (uint64 LE)
+        # Convert from millisecond since epoch to datetime (uint64 LE)
         return datetime.utcfromtimestamp(obj / 1000)

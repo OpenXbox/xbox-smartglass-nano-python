@@ -108,9 +108,9 @@ class InputHandler(Sink):
 
     def send_frame(self):
         packet = frame(
-            buttons=input_frame_buttons.build(self._button_states),
-            analog=input_frame_analog.build(self._analog_states),
-            extension=input_frame_extension.build(dict(byte_6=1))
+            buttons=input_frame_buttons(**self._button_states).container,
+            analog=input_frame_analog(**self._analog_states).container,
+            extension=input_frame_extension(**dict(byte_6=1)).container
         )
         self.client.send_input(packet, datetime.utcnow())
 
