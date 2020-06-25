@@ -35,7 +35,7 @@ SDL_AXIS_MAP = {
     sdl2.SDL_CONTROLLER_AXIS_LEFTX: GamepadAxis.LeftThumbstick_X,
     sdl2.SDL_CONTROLLER_AXIS_LEFTY: GamepadAxis.LeftThumbstick_Y,
     sdl2.SDL_CONTROLLER_AXIS_RIGHTX: GamepadAxis.RightThumbstick_X,
-    sdl2.SDL_CONTROLLER_AXIS_RIGHTY: GamepadAxis.LeftThumbstick_Y
+    sdl2.SDL_CONTROLLER_AXIS_RIGHTY: GamepadAxis.RightThumbstick_Y
 }
 
 SDL_STATE_MAP = {
