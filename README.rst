@@ -10,8 +10,9 @@ Xbox-Smartglass-Nano
     :target: http://xbox-smartglass-nano-python.readthedocs.io/en/latest/?badge=latest
     :alt: Documentation Status
 
-.. image:: https://travis-ci.com/OpenXbox/xbox-smartglass-nano-python.svg?branch=master
-    :target: https://travis-ci.com/OpenXbox/xbox-smartglass-nano-python
+.. image:: https://img.shields.io/github/workflow/status/OpenXbox/xbox-smartglass-nano-python/build?label=build
+    :target: https://github.com/OpenXbox/xbox-smartglass-nano-python/actions?query=workflow%3Abuild
+    :alt: Build status
 
 .. image:: https://img.shields.io/discord/338946086775554048
     :target: https://openxbox.org/discord
