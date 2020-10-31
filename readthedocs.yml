@@ -2,5 +2,5 @@ build:
     image: latest
 
 python:
-    version: 3.6
-pip_install: true
+    version: 3.8
+    pip_install: true

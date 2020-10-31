@@ -1,7 +1,6 @@
-include CONTRIBUTING.rst
-include HISTORY.rst
+include CHANGELOG.md
 include LICENSE
-include README.rst
+include README.md
 
 include xbox/nano/render/input/controller_db.txt
 

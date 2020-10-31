@@ -1,31 +1,21 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from setuptools import setup
-
+from setuptools import setup, find_namespace_packages
 
 setup(
     name="xbox-smartglass-nano",
     version="0.9.4",
     author="OpenXbox",
-    description="The NANO part of the xbox smartglass library",
-    long_description=open('README.rst').read() + '\n\n' + open('HISTORY.rst').read(),
-    long_description_content_type="text/x-rst",
-    license="GPL",
-    keywords="xbox one smartglass nano gamestreaming",
+    author_email="noreply@openxbox.org",
+    description="The NANO (v2) part of the xbox smartglass library",
+    long_description=open('README.md').read() + '\n\n' + open('CHANGELOG.md').read(),
+    long_description_content_type="text/markdown",
+    license="MIT",
+    keywords="xbox one smartglass nano gamestreaming xcloud",
     url="https://github.com/OpenXbox/xbox-smartglass-nano-python",
-    packages=[
-        'xbox.nano',
-        'xbox.nano.render',
-        'xbox.nano.scripts',
-        'xbox.nano.packet',
-        'xbox.nano.factory',
-        'xbox.nano.render.client',
-        'xbox.nano.render.video',
-        'xbox.nano.render.input',
-        'xbox.nano.render.audio'
-    ],
-    namespace_packages=['xbox'],
+    python_requires=">3.7",
+    packages=find_namespace_packages(include=['xbox.*']),
     zip_safe=False,
     include_package_data=True,
     classifiers=[
@@ -34,24 +24,36 @@ setup(
         "License :: OSI Approved :: MIT license",
         "Topic :: Software Development :: Libraries :: Python Modules",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.5",
-        "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
-        "Programming Language :: Python :: 3.8"
-    ],
-    install_requires=[
-        'xbox-smartglass-core>=1.1.0',
-        'marshmallow-objects',
-        'marshmallow-enum',
-        'av==6.1.0',
-        'PySDL2'
-    ],
-    tests_require=[
-        'pytest',
-        'flake8',
-        'tox'
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9"
     ],
     test_suite="tests",
+    install_requires=[
+        #'xbox-smartglass-core==2.0.0',
+        'av==6.1.0',
+        'PySDL2==0.9.7'
+    ],
+    setup_requires=['pytest-runner'],
+    tests_require=['pytest', 'pytest-console-scripts', 'pytest-asyncio'],
+    extras_require={
+        "dev": [
+            "pip",
+            "bump2version",
+            "wheel",
+            "watchdog",
+            "flake8",
+            "coverage",
+            "Sphinx",
+            "sphinx_rtd_theme",
+            "recommonmark",
+            "twine",
+            "pytest",
+            "pytest-asyncio",
+            "pytest-console-scripts",
+            "pytest-runner",
+        ],
+    },
     entry_points={
         'console_scripts': [
             'xbox-nano-client=xbox.nano.scripts.client:main',

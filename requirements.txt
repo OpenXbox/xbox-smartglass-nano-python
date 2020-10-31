@@ -1,0 +1,22 @@
+# Run
+# xbox-smartglass-core==2.0.0
+av==6.1.0
+PySDL2==0.9.7
+
+# Dev
+pip==20.2.3
+setuptools==50.3.0
+bump2version==1.0.1
+wheel==0.35.1
+watchdog==0.10.3
+flake8==3.8.4
+coverage==5.3
+Sphinx==3.2.1
+sphinx_rtd_theme==0.5.0
+recommonmark==0.6.0
+twine==3.2.0
+
+pytest==6.1.1
+pytest-runner==5.2
+pytest-asyncio==0.14.0
+pytest-console-scripts==1.0.0

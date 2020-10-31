@@ -6,11 +6,14 @@
 Welcome to Xbox-Smartglass-Nano's documentation!
 ================================================
 
-.. include:: ../README.rst
+.. mdinclude:: ../README.md
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
+
+   source/xbox.nano.manager
+   source/xbox.nano.protocol
 
 
 
