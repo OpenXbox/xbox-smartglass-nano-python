@@ -6,7 +6,7 @@ STREAMER_VERSION = 3
 
 
 def header(payload_type, connection_id=0, channel_id=0, timestamp=0,
-           streamer=None, padding=False, **kwargs):
+           streamer=None, padding=False, sequence_num=0, **kwargs):
     """
     Helper method for creating a RTP header.
     """
@@ -15,6 +15,7 @@ def header(payload_type, connection_id=0, channel_id=0, timestamp=0,
             padding=padding,
             payload_type=payload_type
         ),
+        sequence_num=sequence_num,
         timestamp=timestamp,
         ssrc=Container(
             connection_id=connection_id,
