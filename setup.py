@@ -31,7 +31,7 @@ setup(
     test_suite="tests",
     install_requires=[
         #'xbox-smartglass-core==2.0.0',
-        'av==6.1.0',
+        'av==8.0.2',
         'PySDL2==0.9.7'
     ],
     setup_requires=['pytest-runner'],
