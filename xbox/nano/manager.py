@@ -110,24 +110,28 @@ class NanoManager(Manager):
     def _on_json(self, data, service_channel):
         msg = json.parse(data)
 
-        if msg.type == BroadcastMessageType.GameStreamState:
-            if msg.state in [GameStreamState.Stopped, GameStreamState.Unknown]:
+        # Convert integer representation to BroadcastMessageType enum
+        msg_type = BroadcastMessageType(msg.type)
+        if msg_type == BroadcastMessageType.GameStreamState:
+            # Convert integer representation to GameStreamState enum
+            msg_state = GameStreamState(msg.state)
+            if msg_state in [GameStreamState.Stopped, GameStreamState.Unknown]:
                 # Clear previously received states
                 self._stream_states = {}
 
-            self._stream_states[msg.state] = msg
-            self._current_state = msg.state
-        elif msg.type == BroadcastMessageType.GameStreamEnabled:
+            self._stream_states[msg_state] = msg
+            self._current_state = msg_state
+        elif msg_type == BroadcastMessageType.GameStreamEnabled:
             self._stream_enabled = msg
-        elif msg.type == BroadcastMessageType.PreviewStatus:
+        elif msg_type == BroadcastMessageType.PreviewStatus:
             self._stream_previewstatus = msg
-        elif msg.type == BroadcastMessageType.Telemetry:
+        elif msg_type == BroadcastMessageType.Telemetry:
             self._stream_telemetry = msg
-        elif msg.type == BroadcastMessageType.GameStreamError:
+        elif msg_type == BroadcastMessageType.GameStreamError:
             self._stream_error = msg
-        elif msg.type in [BroadcastMessageType.StartGameStream,
+        elif msg_type in [BroadcastMessageType.StartGameStream,
                           BroadcastMessageType.StopGameStream]:
-            raise NanoManagerError('{0} received on client side'.format(msg.type.name))
+            raise NanoManagerError('{0} received on client side'.format(msg_type.name))
 
     @property
     def client_major_version(self):
