@@ -77,13 +77,13 @@ class NanoManager(Manager):
         self._stream_telemetry = None
         self._stream_previewstatus = None
 
-    def start_stream(self, config=DEFAULT_CONFIG):
+    def start_stream(self, config: dict = DEFAULT_CONFIG):
         msg = json.BroadcastStartStream(
             type=BroadcastMessageType.StartGameStream,
             reQueryPreviewStatus=True,
             configuration=config
         )
-        self._send_json(msg.dump())
+        self._send_json(msg.json())
 
     def stop_stream(self):
         if self._connected and self._protocol:
@@ -94,7 +94,7 @@ class NanoManager(Manager):
         msg = json.BroadcastStopStream(
             type=BroadcastMessageType.StopGameStream
         )
-        self._send_json(msg.dump())
+        self._send_json(msg.json())
 
     def start_gamestream(self, client):
         if not self.streaming:
