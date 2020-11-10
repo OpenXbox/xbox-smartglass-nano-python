@@ -1,14 +1,14 @@
 import time
 import random
 import logging
+from typing import Optional, Tuple, List
 
-import gevent
-import gevent.event
-from gevent import socket
-from gevent.server import DatagramServer
+import asyncio
+from asyncio.streams import StreamReader, StreamWriter
+from asyncio.transports import DatagramTransport
+from asyncio.protocols import DatagramProtocol
 
 from xbox.sg.utils.events import Event
-
 from xbox.nano import factory, packer
 from xbox.nano.enum import RtpPayloadType, ChannelControlPayloadType
 from xbox.nano.channel import CHANNEL_CLASS_MAP
@@ -30,39 +30,47 @@ class NanoProtocol(object):
     Server sends ChannelCreates and ChannelOpens
     Client responds with ChannelOpens (copying possible flags)
     """
-    def __init__(self, client, address, session_id, tcp_port, udp_port):
+    def __init__(self, client, address: str, session_id, tcp_port: int, udp_port: int):
+        self.loop = asyncio.get_running_loop()
+
         self.client = client
         self.session_id = session_id
 
+        self.remote_addr = address
+        self.tcp_port = tcp_port
+        self.udp_port = udp_port
+
         self.channels = {}
         self.connection_id = 0
-        self.connected = gevent.event.Event()
+        self.connected = asyncio.Future()
 
-        self.control_protocol = ControlProtocol(address, tcp_port, self)
-        self.streamer_protocol = StreamerProtocol(address, udp_port, self)
+        self.control_protocol: ControlProtocol = ControlProtocol(address, tcp_port, self)
+        self.streamer_transport: Optional[DatagramTransport] = None
+        self.streamer_protocol: Optional[StreamerProtocol] = None
 
         # TODO: pull this more into NanoProtocol if it's a bottleneck?
         self.control_protocol.on_message += self._on_control_message
         self.streamer_protocol.on_message += self._on_streamer_message
 
-    def start(self):
-        self.control_protocol.start()
-        self.streamer_protocol.start()
-        self.client.open(self)
+    async def start(self):
+        await self.control_protocol.start()
 
-    def stop(self):
+        self.streamer_transport, self.streamer_protocol = await self.loop.create_datagram_endpoint(
+            lambda: StreamerProtocol(),
+            remote_addr=(self.remote_addr, self.udp_port)
+        )
+        await self.client.open(self)
+
+    async def stop(self):
         # TODO: close channels and stuff?
-        self.control_protocol.stop()
-        self.streamer_protocol.stop()
+        await self.control_protocol.stop()
+        self.streamer_transport.close()
 
-    def connect(self, timeout=10):
-        with gevent.Timeout(timeout, NanoProtocolError):
-            self.channel_control_handshake()
-            self.connected.wait()
+    async def connect(self, timeout=10):
+        await self.channel_control_handshake()
 
-            self.udp_handshake()
-            while not self.streamer_protocol.connected.wait(0.2):
-                self.udp_handshake()
+        await self.udp_handshake()
+        # TODO: Wait for connected event
 
     def get_channel(self, channel_class):
         """
@@ -80,14 +88,14 @@ class NanoProtocol(object):
             if isinstance(channel, _class):
                 return channel
 
-    def _on_control_message(self, msg):
+    async def _on_control_message(self, msg):
         payload_type = msg.header.flags.payload_type
         channel_id = msg.header.ssrc.channel_id
 
         if payload_type == RtpPayloadType.Control and \
                 msg.payload.type == ChannelControlPayloadType.ServerHandshake:
             self.connection_id = msg.payload.connection_id
-            self.connected.set()
+            self.connected.set_result(True)
 
         elif payload_type == RtpPayloadType.ChannelControl:
             if msg.payload.type == ChannelControlPayloadType.ChannelCreate:
@@ -130,7 +138,7 @@ class NanoProtocol(object):
         else:
             log.warning("Unknown payload type", extra={'_msg': msg})
 
-    def _on_streamer_message(self, msg):
+    async def _on_streamer_message(self, msg):
         channel_id = msg.header.ssrc.channel_id
 
         if channel_id not in self.channels:
@@ -141,28 +149,28 @@ class NanoProtocol(object):
 
         self.channels[channel_id].on_message(msg)
 
-    def channel_control_handshake(self, connection_id=None):
+    async def channel_control_handshake(self, connection_id=None):
         if not connection_id:
             connection_id = random.randint(50000, 60000)
 
         msg = factory.channel.control_handshake(connection_id)
-        self.control_protocol.send_message(msg)
+        await self.control_protocol.send_message(msg)
 
-    def channel_create(self, name, flags, channel_id):
+    async def channel_create(self, name, flags, channel_id):
         msg = factory.channel.create(name, flags, channel_id)
-        self.control_protocol.send_message(msg)
+        await self.control_protocol.send_message(msg)
 
-    def channel_open(self, flags, channel_id):
+    async def channel_open(self, flags, channel_id):
         msg = factory.channel.open(flags, channel_id)
-        self.control_protocol.send_message(msg)
+        await self.control_protocol.send_message(msg)
 
-    def channel_close(self, flags, channel_id):
+    async def channel_close(self, flags, channel_id):
         msg = factory.channel.close(flags, channel_id)
-        self.control_protocol.send_message(msg)
+        await self.control_protocol.send_message(msg)
 
-    def udp_handshake(self):
+    async def udp_handshake(self):
         msg = factory.udp_handshake(self.connection_id)
-        self.streamer_protocol.send_message(msg)
+        await self.streamer_protocol.send_message(msg)
 
 
 class ControlProtocolError(Exception):
@@ -172,35 +180,44 @@ class ControlProtocolError(Exception):
 class ControlProtocol(object):
     BUFFER_SIZE = 4096
 
-    def __init__(self, address, port, nano):
-        self.host = (address, port)
+    def __init__(self, address: str, port: int, nano: NanoProtocol):
+        self.host: Tuple[str, int] = (address, port)
         self._nano = nano  # Do we want this? Circular reference..
         self._q = []
-        self._socket = None
-        self._recv_thread = None
+        self._reader: Optional[StreamReader] = None
+        self._writer: Optional[StreamWriter] = None
+        self._recv_task: Optional[asyncio.Task] = None
 
         self.on_message = Event()
 
-    def start(self):
-        self._socket = socket.create_connection(self.host)
-        self._recv_thread = gevent.spawn(self._recv)
+    async def start(self):
+        address, port = self.host
+        self._reader, self._writer = await asyncio.open_connection(address, port)
+        self._recv_task = asyncio.create_task(self._recv())
 
-    def stop(self):
-        self._socket.close()
-        gevent.kill(self._recv_thread)
+    async def stop(self):
+        if self._recv_task:
+            self._recv_task.cancel()
+            try:
+                await self._recv_task
+            except asyncio.CancelledError:
+                log.warning('ControlProtocol: Cancelled recv task')
 
-    def handle(self, data):
+        if self._writer:
+            self._writer.close()
+            await self._writer.wait_closed()
+
+    async def handle(self, data):
         try:
             for msg in packer.unpack_tcp(data, self._nano.channels):
                 self.on_message(msg)
         except Exception as e:
             log.exception("Exception in ControlProtocol message handler")
 
-    def _recv(self):
-        while 1:
-            socket.wait_read(self._socket.fileno())
-            data = self._socket.recv(self.BUFFER_SIZE)
-            self.handle(data)
+    async def _recv(self):
+        while True:
+            data = await self._reader.read(self.BUFFER_SIZE)
+            await self.handle(data)
 
     def _send(self, msgs):
         data = packer.pack_tcp(msgs, self._nano.channels)
@@ -208,7 +225,8 @@ class ControlProtocol(object):
         if not data:
             raise ControlProtocolError('No data')
 
-        self._socket.send(data)
+        self._writer.write(data)
+        # await self._writer.drain()
 
     def queue(self, msg):
         self._q.append(msg)
@@ -217,7 +235,7 @@ class ControlProtocol(object):
         self._send(self._q)
         self._q = []
 
-    def send_message(self, msg):
+    async def send_message(self, msg):
         self.queue(msg)
         self.flush()
 
@@ -226,22 +244,21 @@ class StreamerProtocolError(Exception):
     pass
 
 
-class StreamerProtocol(DatagramServer):
-    def __init__(self, address, port, nano):
-        self.host = (address, port)
-        self.connected = gevent.event.Event()
-        self._nano = nano  # Do we want this? Circular reference..
+class StreamerProtocol(object):
+    def __init__(self, address: str, port: int, nano: NanoProtocol):
+        self._nano: NanoProtocol = nano  # Do we want this? Circular reference..
+
+        self.host: Tuple[str, int] = (address, port)
+        self.connected = asyncio.Future()
+        self.transport: Optional[DatagramTransport] = None
 
         self.on_message = Event()
 
-        super(DatagramServer, self).__init__(('*:0'))
+    def connection_made(self, transport):
+        self.transport = transport
 
-    def stop(self, *args, **kwargs):
-        super(DatagramServer, self).stop(*args, **kwargs)
-
-    def handle(self, data, addr):
-        if not self.connected.is_set():
-            self.connected.set()
+    def datagram_received(self, data, addr):
+        self.connected.set_result(True)
 
         try:
             msg = packer.unpack(data, self._nano.channels)
@@ -250,10 +267,16 @@ class StreamerProtocol(DatagramServer):
         except Exception as e:
             log.exception("Exception in StreamerProtocol message handler")
 
+    def error_received(self, exc):
+        print('Error received:', exc)
+
+    def connection_lost(self, exc):
+        print("Connection closed")
+
     def send_message(self, msg):
         data = packer.pack(msg)
 
         if not data:
             raise StreamerProtocolError('No data')
 
-        self.socket.sendto(data, self.host)
+        self.transport.sendto(data)
