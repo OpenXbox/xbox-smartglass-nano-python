@@ -1,6 +1,7 @@
 import logging
 from xbox.sg.manager import Manager
 from xbox.sg.enum import ServiceChannel
+from xbox.sg.utils.events import Event
 
 from xbox.nano.packet import json
 from xbox.nano.protocol import NanoProtocol
@@ -71,6 +72,8 @@ class NanoManager(Manager):
         self._connected = False
         self._current_state = GameStreamState.Unknown
 
+        self.on_gamestream_error = Event()
+
         self._stream_states = {}
         self._stream_enabled = None
         self._stream_error = None
@@ -112,6 +115,7 @@ class NanoManager(Manager):
 
         # Convert integer representation to BroadcastMessageType enum
         msg_type = BroadcastMessageType(msg.type)
+
         if msg_type == BroadcastMessageType.GameStreamState:
             # Convert integer representation to GameStreamState enum
             msg_state = GameStreamState(msg.state)
@@ -129,6 +133,7 @@ class NanoManager(Manager):
             self._stream_telemetry = msg
         elif msg_type == BroadcastMessageType.GameStreamError:
             self._stream_error = msg
+            self.on_gamestream_error(msg)
         elif msg_type in [BroadcastMessageType.StartGameStream,
                           BroadcastMessageType.StopGameStream]:
             raise NanoManagerError('{0} received on client side'.format(msg_type.name))

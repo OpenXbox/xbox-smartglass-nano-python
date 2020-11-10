@@ -79,7 +79,8 @@ class BroadcastStopStream(BaseBroadcastMessage):
 
 
 class BroadcastError(BaseBroadcastMessage):
-    pass
+    errorType: int
+    errorValue: int
 
 
 class BroadcastTelemetry(BaseBroadcastMessage):

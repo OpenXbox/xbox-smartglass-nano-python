@@ -12,6 +12,11 @@ from xbox.nano.manager import NanoManager
 from xbox.nano.render.client import SDLClient
 
 
+def on_gamestream_error(error_msg) -> None:
+    print(f'!!! Gamestream error occured: {error_msg}')
+    sys.exit(1)
+
+
 async def async_main():
     parser = argparse.ArgumentParser(description="Basic smartglass NANO client")
     parser.add_argument('--address', '-a',
@@ -25,6 +30,8 @@ async def async_main():
         console = discovered[0]
 
         console.add_manager(NanoManager)
+        console.nano.on_gamestream_error += on_gamestream_error
+
         await console.connect("", "")
         if console.connection_state != ConnectionState.Connected:
             print("Connection failed")
