@@ -10,6 +10,9 @@ class BroadcastJsonError(Exception):
 class BaseBroadcastMessage(BaseModel):
     type: BroadcastMessageType
 
+    class Config:
+        use_enum_values = True
+
 
 class BroadcastStreamEnabled(BaseBroadcastMessage):
     enabled: bool

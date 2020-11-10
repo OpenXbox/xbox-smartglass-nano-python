@@ -77,15 +77,15 @@ class NanoManager(Manager):
         self._stream_telemetry = None
         self._stream_previewstatus = None
 
-    def start_stream(self, config: dict = DEFAULT_CONFIG):
+    async def start_stream(self, config: dict = DEFAULT_CONFIG):
         msg = json.BroadcastStartStream(
             type=BroadcastMessageType.StartGameStream,
             reQueryPreviewStatus=True,
             configuration=config
         )
-        self._send_json(msg.json())
+        await self._send_json(msg.dict())
 
-    def stop_stream(self):
+    async def stop_stream(self):
         if self._connected and self._protocol:
             self._protocol.disconnect()
             self._protocol.stop()
@@ -94,17 +94,17 @@ class NanoManager(Manager):
         msg = json.BroadcastStopStream(
             type=BroadcastMessageType.StopGameStream
         )
-        self._send_json(msg.json())
+        await self._send_json(msg.dict())
 
-    def start_gamestream(self, client):
+    async def start_gamestream(self, client):
         if not self.streaming:
             raise NanoManagerError('start_gamestream: Connection params not ready')
 
         self._protocol = NanoProtocol(
             client, self.console.address, self.session_id, self.tcp_port, self.udp_port
         )
-        self._protocol.start()
-        self._protocol.connect()
+        await self._protocol.start()
+        await self._protocol.connect()
         self._connected = True
 
     def _on_json(self, data, service_channel):

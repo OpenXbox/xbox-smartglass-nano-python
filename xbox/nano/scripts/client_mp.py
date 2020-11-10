@@ -82,7 +82,7 @@ def sink_pump(pipe, sink):
             sink.render(data)
 
 
-async def main():
+async def async_main():
     logging.basicConfig(level=logging.DEBUG)
 
     vparent, vchild = multiprocessing.Pipe()
@@ -111,6 +111,10 @@ async def main():
     client.open(None)
 
 
-if __name__ == '__main__':
+def main():
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(main())
+    loop.run_until_complete(async_main())
+
+
+if __name__ == '__main__':
+    main()
