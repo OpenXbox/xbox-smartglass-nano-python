@@ -47,13 +47,13 @@ xbox-nano-client
 
 ## Development workflow
 
-Ready to contribute? Here's how to set up `xbox-smartglass-core-python` for local development.
+Ready to contribute? Here's how to set up `xbox-smartglass-nano-python` for local development.
 
-1. Fork the `xbox-smartglass-core-python` repo on GitHub.
+1. Fork the `xbox-smartglass-nano-python` repo on GitHub.
 2. Clone your fork locally
 
 ```text
-git clone git@github.com:your_name_here/xbox-smartglass-core-python.git
+git clone git@github.com:your_name_here/xbox-smartglass-nano-python.git
 ```
 
 3. Install your local copy into a virtual environment. This is how you set up your fork for local development
@@ -61,7 +61,7 @@ git clone git@github.com:your_name_here/xbox-smartglass-core-python.git
 ```text
 python -m venv ~/pyvenv/xbox-smartglass
 source ~/pyvenv/xbox-smartglass/bin/activate
-cd xbox-smartglass-core-python
+cd xbox-smartglass-nano-python
 pip install -e .[dev]
 ```
 
