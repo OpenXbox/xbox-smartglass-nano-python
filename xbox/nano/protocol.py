@@ -48,28 +48,37 @@ class NanoProtocol(object):
         self.streamer_transport: Optional[DatagramTransport] = None
         self.streamer_protocol: Optional[StreamerProtocol] = None
 
-        # TODO: pull this more into NanoProtocol if it's a bottleneck?
-        self.control_protocol.on_message += self._on_control_message
-        self.streamer_protocol.on_message += self._on_streamer_message
-
     async def start(self):
+        # Initialize TCP socket
+        self.control_protocol.on_message += self._on_control_message
         await self.control_protocol.start()
 
+        # Initialize UDP socket
         self.streamer_transport, self.streamer_protocol = await self.loop.create_datagram_endpoint(
-            lambda: StreamerProtocol(),
+            lambda: StreamerProtocol(self),
             remote_addr=(self.remote_addr, self.udp_port)
         )
-        await self.client.open(self)
+        self.streamer_protocol.on_message += self._on_streamer_message
+        
+        self.client.open(self)
 
     async def stop(self):
+        self.control_protocol.on_message -= self._on_control_message
+        self.streamer_protocol.on_message -= self._on_streamer_message
+
         # TODO: close channels and stuff?
         await self.control_protocol.stop()
         self.streamer_transport.close()
 
     async def connect(self, timeout=10):
-        await self.channel_control_handshake()
+        self.channel_control_handshake()
 
-        await self.udp_handshake()
+        async def udp_handshake_loop():
+            for _ in range(5):
+                self.udp_handshake()
+                asyncio.sleep(0.5)
+        
+        asyncio.create_task(udp_handshake_loop())
         # TODO: Wait for connected event
 
     def get_channel(self, channel_class):
@@ -88,7 +97,7 @@ class NanoProtocol(object):
             if isinstance(channel, _class):
                 return channel
 
-    async def _on_control_message(self, msg):
+    def _on_control_message(self, msg):
         payload_type = msg.header.flags.payload_type
         channel_id = msg.header.ssrc.channel_id
 
@@ -138,7 +147,7 @@ class NanoProtocol(object):
         else:
             log.warning("Unknown payload type", extra={'_msg': msg})
 
-    async def _on_streamer_message(self, msg):
+    def _on_streamer_message(self, msg):
         channel_id = msg.header.ssrc.channel_id
 
         if channel_id not in self.channels:
@@ -149,28 +158,28 @@ class NanoProtocol(object):
 
         self.channels[channel_id].on_message(msg)
 
-    async def channel_control_handshake(self, connection_id=None):
+    def channel_control_handshake(self, connection_id=None):
         if not connection_id:
             connection_id = random.randint(50000, 60000)
 
         msg = factory.channel.control_handshake(connection_id)
-        await self.control_protocol.send_message(msg)
+        self.control_protocol.send_message(msg)
 
-    async def channel_create(self, name, flags, channel_id):
+    def channel_create(self, name, flags, channel_id):
         msg = factory.channel.create(name, flags, channel_id)
-        await self.control_protocol.send_message(msg)
+        self.control_protocol.send_message(msg)
 
-    async def channel_open(self, flags, channel_id):
+    def channel_open(self, flags, channel_id):
         msg = factory.channel.open(flags, channel_id)
-        await self.control_protocol.send_message(msg)
+        self.control_protocol.send_message(msg)
 
-    async def channel_close(self, flags, channel_id):
+    def channel_close(self, flags, channel_id):
         msg = factory.channel.close(flags, channel_id)
-        await self.control_protocol.send_message(msg)
+        self.control_protocol.send_message(msg)
 
-    async def udp_handshake(self):
+    def udp_handshake(self):
         msg = factory.udp_handshake(self.connection_id)
-        await self.streamer_protocol.send_message(msg)
+        self.streamer_protocol.send_message(msg)
 
 
 class ControlProtocolError(Exception):
@@ -235,7 +244,7 @@ class ControlProtocol(object):
         self._send(self._q)
         self._q = []
 
-    async def send_message(self, msg):
+    def send_message(self, msg):
         self.queue(msg)
         self.flush()
 
@@ -245,10 +254,9 @@ class StreamerProtocolError(Exception):
 
 
 class StreamerProtocol(object):
-    def __init__(self, address: str, port: int, nano: NanoProtocol):
+    def __init__(self, nano: NanoProtocol):
         self._nano: NanoProtocol = nano  # Do we want this? Circular reference..
 
-        self.host: Tuple[str, int] = (address, port)
         self.connected = asyncio.Future()
         self.transport: Optional[DatagramTransport] = None
 
