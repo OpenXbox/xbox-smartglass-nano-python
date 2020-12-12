@@ -74,12 +74,11 @@ class NanoProtocol(object):
         self.channel_control_handshake()
 
         async def udp_handshake_loop():
-            for _ in range(5):
+            while not self.streamer_protocol.connected.done():
                 self.udp_handshake()
-                asyncio.sleep(0.5)
+                await asyncio.sleep(0.5)
         
         asyncio.create_task(udp_handshake_loop())
-        # TODO: Wait for connected event
 
     def get_channel(self, channel_class):
         """
@@ -266,7 +265,8 @@ class StreamerProtocol(object):
         self.transport = transport
 
     def datagram_received(self, data, addr):
-        self.connected.set_result(True)
+        if not self.connected.done():
+            self.connected.set_result(True)
 
         try:
             msg = packer.unpack(data, self._nano.channels)
