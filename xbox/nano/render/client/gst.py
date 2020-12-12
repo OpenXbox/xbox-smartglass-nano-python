@@ -1,6 +1,7 @@
 import logging
-import gevent
-from gevent import queue
+import asyncio
+from typing import Optional
+from asyncio import Queue
 
 import gi
 from gi.repository import Gst, GObject, GLib
@@ -17,10 +18,10 @@ class GstClient(Client):
         self.protocol = None
 
         self._running = False
-        self._loop_thread = None
+        self._loop_task: Optional[asyncio.Task] = None
 
-        self._video_frames = queue.Queue()
-        self._audio_frames = queue.Queue()
+        self._video_frames = Queue()
+        self._audio_frames = Queue()
 
         GObject.threads_init()
         Gst.init(None)
@@ -77,13 +78,13 @@ class GstClient(Client):
         self._running = False
 
     def start_loop(self):
-        self._loop_thread = gevent.spawn(self.loop)
+        self._loop_task = asyncio.create_task(self.loop())
 
-    def loop(self):
+    async def loop(self):
         self._running = True
         while self._running:
             self.pump()
-            gevent.sleep(0)
+            await asyncio.sleep(0.0)
 
     def pump(self):
         self.context.iteration(may_block=False)
@@ -129,8 +130,8 @@ class GstClient(Client):
 
         # log.debug('%s needs %i bytes of data' % (src.get_name(), length))
         try:
-            data = frame_buf.get(block=False)
-        except queue.Empty as e:
+            data = frame_buf.get_nowait()
+        except asyncio.QueueEmpty as e:
             # log.debug('%s Queue is empty %s' % (src.get_name(), e))
             # FIXME: Passing an empty buffer produces:
             # FIXME: GStreamer-CRITICAL **: gst_memory_get_sizes: assertion 'mem != NULL' failed

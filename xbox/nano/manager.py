@@ -1,6 +1,7 @@
 import logging
 from xbox.sg.manager import Manager
 from xbox.sg.enum import ServiceChannel
+from xbox.sg.utils.events import Event
 
 from xbox.nano.packet import json
 from xbox.nano.protocol import NanoProtocol
@@ -71,21 +72,23 @@ class NanoManager(Manager):
         self._connected = False
         self._current_state = GameStreamState.Unknown
 
+        self.on_gamestream_error = Event()
+
         self._stream_states = {}
         self._stream_enabled = None
         self._stream_error = None
         self._stream_telemetry = None
         self._stream_previewstatus = None
 
-    def start_stream(self, config=DEFAULT_CONFIG):
+    async def start_stream(self, config: dict = DEFAULT_CONFIG):
         msg = json.BroadcastStartStream(
             type=BroadcastMessageType.StartGameStream,
             reQueryPreviewStatus=True,
             configuration=config
         )
-        self._send_json(msg.dump())
+        await self._send_json(msg.dict())
 
-    def stop_stream(self):
+    async def stop_stream(self):
         if self._connected and self._protocol:
             self._protocol.disconnect()
             self._protocol.stop()
@@ -94,40 +97,46 @@ class NanoManager(Manager):
         msg = json.BroadcastStopStream(
             type=BroadcastMessageType.StopGameStream
         )
-        self._send_json(msg.dump())
+        await self._send_json(msg.dict())
 
-    def start_gamestream(self, client):
+    async def start_gamestream(self, client):
         if not self.streaming:
             raise NanoManagerError('start_gamestream: Connection params not ready')
 
         self._protocol = NanoProtocol(
             client, self.console.address, self.session_id, self.tcp_port, self.udp_port
         )
-        self._protocol.start()
-        self._protocol.connect()
+        await self._protocol.start()
+        await self._protocol.connect()
         self._connected = True
 
     def _on_json(self, data, service_channel):
         msg = json.parse(data)
 
-        if msg.type == BroadcastMessageType.GameStreamState:
-            if msg.state in [GameStreamState.Stopped, GameStreamState.Unknown]:
+        # Convert integer representation to BroadcastMessageType enum
+        msg_type = BroadcastMessageType(msg.type)
+
+        if msg_type == BroadcastMessageType.GameStreamState:
+            # Convert integer representation to GameStreamState enum
+            msg_state = GameStreamState(msg.state)
+            if msg_state in [GameStreamState.Stopped, GameStreamState.Unknown]:
                 # Clear previously received states
                 self._stream_states = {}
 
-            self._stream_states[msg.state] = msg
-            self._current_state = msg.state
-        elif msg.type == BroadcastMessageType.GameStreamEnabled:
+            self._stream_states[msg_state] = msg
+            self._current_state = msg_state
+        elif msg_type == BroadcastMessageType.GameStreamEnabled:
             self._stream_enabled = msg
-        elif msg.type == BroadcastMessageType.PreviewStatus:
+        elif msg_type == BroadcastMessageType.PreviewStatus:
             self._stream_previewstatus = msg
-        elif msg.type == BroadcastMessageType.Telemetry:
+        elif msg_type == BroadcastMessageType.Telemetry:
             self._stream_telemetry = msg
-        elif msg.type == BroadcastMessageType.GameStreamError:
+        elif msg_type == BroadcastMessageType.GameStreamError:
             self._stream_error = msg
-        elif msg.type in [BroadcastMessageType.StartGameStream,
+            self.on_gamestream_error(msg)
+        elif msg_type in [BroadcastMessageType.StartGameStream,
                           BroadcastMessageType.StopGameStream]:
-            raise NanoManagerError('{0} received on client side'.format(msg.type.name))
+            raise NanoManagerError('{0} received on client side'.format(msg_type.name))
 
     @property
     def client_major_version(self):

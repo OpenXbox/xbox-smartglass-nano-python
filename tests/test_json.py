@@ -19,7 +19,7 @@ def test_stream_enabled(json_messages):
     data = json_messages['broadcast_stream_enabled']
     msg = json.parse(data)
 
-    assert msg.type == BroadcastMessageType.GameStreamEnabled
+    assert msg.type == BroadcastMessageType.GameStreamEnabled.value
     assert msg.enabled is True
     assert msg.canBeEnabled is True
     assert msg.majorProtocolVersion == 6
@@ -67,7 +67,7 @@ def test_start_stream(json_messages):
     data = json_messages['broadcast_start_stream']
     msg = json.parse(data)
 
-    assert msg.type == BroadcastMessageType.StartGameStream
+    assert msg.type == BroadcastMessageType.StartGameStream.value
     assert msg.reQueryPreviewStatus is True
     assert msg.configuration == _config
 
@@ -77,15 +77,15 @@ def test_stop_stream(json_messages):
     data = json_messages['broadcast_stop_stream']
     msg = json.parse(data)
 
-    assert msg.type == BroadcastMessageType.StopGameStream
+    assert msg.type == BroadcastMessageType.StopGameStream.value
 
 
 def test_state_unknown(json_messages):
     data = json_messages['broadcast_state_unknown']
     msg = json.parse(data)
 
-    assert msg.type == BroadcastMessageType.GameStreamState
-    assert msg.state == GameStreamState.Unknown
+    assert msg.type == BroadcastMessageType.GameStreamState.value
+    assert msg.state == GameStreamState.Unknown.value
     assert msg.sessionId == ''
 
 
@@ -93,8 +93,8 @@ def test_state_init(json_messages):
     data = json_messages['broadcast_state_init']
     msg = json.parse(data)
 
-    assert msg.type == BroadcastMessageType.GameStreamState
-    assert msg.state == GameStreamState.Initializing
+    assert msg.type == BroadcastMessageType.GameStreamState.value
+    assert msg.state == GameStreamState.Initializing.value
     assert msg.sessionId == '{14608F3C-1C4A-4F32-9DA6-179CE1001E4A}'
     assert msg.udpPort == 49665
     assert msg.tcpPort == 53394
@@ -104,8 +104,8 @@ def test_state_started(json_messages):
     data = json_messages['broadcast_state_started']
     msg = json.parse(data)
 
-    assert msg.type == BroadcastMessageType.GameStreamState
-    assert msg.state == GameStreamState.Started
+    assert msg.type == BroadcastMessageType.GameStreamState.value
+    assert msg.state == GameStreamState.Started.value
     assert msg.sessionId == '{14608F3C-1C4A-4F32-9DA6-179CE1001E4A}'
     assert msg.isWirelessConnection is False
     assert msg.wirelessChannel == 0
@@ -116,8 +116,8 @@ def test_state_stopped(json_messages):
     data = json_messages['broadcast_state_stopped']
     msg = json.parse(data)
 
-    assert msg.type == BroadcastMessageType.GameStreamState
-    assert msg.state == GameStreamState.Stopped
+    assert msg.type == BroadcastMessageType.GameStreamState.value
+    assert msg.state == GameStreamState.Stopped.value
     assert msg.sessionId == '{14608F3C-1C4A-4F32-9DA6-179CE1001E4A}'
 
 
@@ -126,7 +126,7 @@ def test_error(json_messages):
     data = json_messages['broadcast_error']
     msg = json.parse(data)
 
-    assert msg.type == BroadcastMessageType.GameStreamError
+    assert msg.type == BroadcastMessageType.GameStreamError.value
 
 
 @pytest.mark.skip()
@@ -134,13 +134,13 @@ def test_telemetry(json_messages):
     data = json_messages['broadcast_telemetry']
     msg = json.parse(data)
 
-    assert msg.type == BroadcastMessageType.Telemetry
+    assert msg.type == BroadcastMessageType.Telemetry.value
 
 
 def test_previewstatus(json_messages):
     data = json_messages['broadcast_previewstatus']
     msg = json.parse(data)
 
-    assert msg.type == BroadcastMessageType.PreviewStatus
+    assert msg.type == BroadcastMessageType.PreviewStatus.value
     assert msg.isPublicPreview is False
     assert msg.isInternalPreview is False

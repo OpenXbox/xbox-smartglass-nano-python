@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import threading
 import multiprocessing
@@ -37,31 +38,30 @@ class PipedSink(Sink):
         self.pipe.send(data)
 
 
-def protocol_runner(video_pipe, audio_pipe):
-    import gevent
-    import logging
+async def protocol_runner(video_pipe, audio_pipe):
     from xbox.sg.console import Console
     from xbox.nano.manager import NanoManager
     from xbox.nano.render.client import Client
 
     logging.basicConfig(level=logging.DEBUG)
 
-    consoles = Console.discover(timeout=1)
+    consoles = await Console.discover(timeout=1)
     if len(consoles):
         console = consoles[0]
 
         console.add_manager(NanoManager)
-        console.connect()
-        gevent.sleep(1)
+        await console.connect()
+        await console.wait(1)
         print('connected')
-        console.nano.start_stream()
-        console.wait(2)
+        await console.nano.start_stream()
+        await console.wait(2)
 
         client = Client(PipedSink(video_pipe), PipedSink(audio_pipe), Sink())
-        console.nano.start_gamestream(client)
+        await console.nano.start_gamestream(client)
         print('stream started')
         try:
-            console.protocol.serve_forever()
+            while True:
+                await asyncio.sleep(5.0)
         except KeyboardInterrupt:
             pass
 
@@ -82,7 +82,7 @@ def sink_pump(pipe, sink):
             sink.render(data)
 
 
-def main():
+async def async_main():
     logging.basicConfig(level=logging.DEBUG)
 
     vparent, vchild = multiprocessing.Pipe()
@@ -109,6 +109,11 @@ def main():
     audio_pumper.start()
 
     client.open(None)
+
+
+def main():
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(async_main())
 
 
 if __name__ == '__main__':

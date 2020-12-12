@@ -1,5 +1,5 @@
-from marshmallow_objects import Model, fields
-from marshmallow_enum import EnumField
+from typing import Union
+from pydantic import BaseModel
 from xbox.nano.enum import BroadcastMessageType, GameStreamState
 
 
@@ -7,71 +7,118 @@ class BroadcastJsonError(Exception):
     pass
 
 
-class _BroadcastMessage(Model):
-    type = EnumField(BroadcastMessageType, by_value=True)
+class BaseBroadcastMessage(BaseModel):
+    type: BroadcastMessageType
+
+    class Config:
+        use_enum_values = True
 
 
-class BroadcastStreamEnabled(_BroadcastMessage):
-    enabled = fields.Bool()
-    canBeEnabled = fields.Bool()
-    majorProtocolVersion = fields.Int()
-    minorProtocolVersion = fields.Int()
+class BroadcastStreamEnabled(BaseBroadcastMessage):
+    enabled: bool
+    canBeEnabled: bool
+    majorProtocolVersion: int
+    minorProtocolVersion: int
 
 
-class BroadcastPreviewStatus(_BroadcastMessage):
-    isPublicPreview = fields.Bool()
-    isInternalPreview = fields.Bool()
+class BroadcastPreviewStatus(BaseBroadcastMessage):
+    isPublicPreview: bool
+    isInternalPreview: bool
 
 
-class BroadcastStartStream(_BroadcastMessage):
-    configuration = fields.Dict()
-    reQueryPreviewStatus = fields.Bool(default=False)
+class GamestreamConfiguration(BaseModel):
+    audioFecType: str
+    audioSyncPolicy: str
+    audioSyncMaxLatency: str
+    audioSyncDesiredLatency: str
+    audioSyncMinLatency: str
+    audioSyncCompressLatency: str
+    audioSyncCompressFactor: str
+    audioSyncLengthenFactor: str
+    audioBufferLengthHns: str
+
+    enableOpusChatAudio: str
+    enableDynamicBitrate: str
+    enableAudioChat: str
+    enableVideoFrameAcks: str
+    enableOpusAudio: str
+
+    dynamicBitrateUpdateMs: str
+    dynamicBitrateScaleFactor: str
+
+    inputReadsPerSecond: str
+
+    videoFecType: str
+    videoFecLevel: str
+    videoMaximumWidth: str
+    videoMaximumHeight: str
+    videoMaximumFrameRate: str
+    videoPacketUtilization: str
+    videoPacketDefragTimeoutMs: str
+    sendKeyframesOverTCP: str
+
+    udpSubBurstGroups: str
+    udpBurstDurationMs: str
+    udpMaxSendPacketsInWinsock: str
+
+    urcpType: str
+    urcpFixedRate: str
+    urcpMaximumRate: str
+    urcpMinimumRate: str
+    urcpMaximumWindow: str
+    urcpKeepAliveTimeoutMs: str
 
 
-class BroadcastStopStream(_BroadcastMessage):
+class BroadcastStartStream(BaseBroadcastMessage):
+    configuration: GamestreamConfiguration
+    reQueryPreviewStatus: bool = False
+
+
+class BroadcastStopStream(BaseBroadcastMessage):
     pass
 
 
-class BroadcastError(_BroadcastMessage):
+class BroadcastError(BaseBroadcastMessage):
+    errorType: int
+    errorValue: int
+
+
+class BroadcastTelemetry(BaseBroadcastMessage):
     pass
 
 
-class BroadcastTelemetry(_BroadcastMessage):
+class BaseBroadcastStateMessage(BaseBroadcastMessage):
+    state: GameStreamState
+    sessionId: str
+
+
+class BroadcastStateUnknown(BaseBroadcastStateMessage):
     pass
 
 
-class _BroadcastStateMessage(_BroadcastMessage):
-    state = EnumField(GameStreamState, by_value=True)
-    sessionId = fields.Str()
+class BroadcastStateInitializing(BaseBroadcastStateMessage):
+    udpPort: int
+    tcpPort: int
 
 
-class BroadcastStateUnknown(_BroadcastStateMessage):
+class BroadcastStateStarted(BaseBroadcastStateMessage):
+    isWirelessConnection: bool
+    wirelessChannel: int
+    transmitLinkSpeed: int
+
+
+class BroadcastStateStopped(BaseBroadcastStateMessage):
     pass
 
 
-class BroadcastStateInitializing(_BroadcastStateMessage):
-    udpPort = fields.Int()
-    tcpPort = fields.Int()
-
-
-class BroadcastStateStarted(_BroadcastStateMessage):
-    isWirelessConnection = fields.Bool()
-    wirelessChannel = fields.Int()
-    transmitLinkSpeed = fields.Int()
-
-
-class BroadcastStateStopped(_BroadcastStateMessage):
-    pass
-
-
-class BroadcastStatePaused(_BroadcastStateMessage):
+class BroadcastStatePaused(BaseBroadcastStateMessage):
     pass
 
 
 TYPE_MAP = {
     BroadcastMessageType.StartGameStream: BroadcastStartStream,
     BroadcastMessageType.StopGameStream: BroadcastStopStream,
-    BroadcastMessageType.GameStreamState: _BroadcastStateMessage,
+    BroadcastMessageType.GameStreamState: BaseBroadcastStateMessage,
     BroadcastMessageType.GameStreamEnabled: BroadcastStreamEnabled,
     BroadcastMessageType.GameStreamError: BroadcastError,
     BroadcastMessageType.Telemetry: BroadcastTelemetry,
@@ -87,7 +134,14 @@ STATE_MAP = {
 }
 
 
-def parse(data):
+def parse(
+    data: dict
+) -> Union[
+        BroadcastStartStream, BroadcastStopStream, BroadcastStreamEnabled,
+        BroadcastError, BroadcastTelemetry, BroadcastPreviewStatus,
+        BroadcastStateUnknown, BroadcastStateInitializing, BroadcastStateStarted,
+        BroadcastStateStopped, BroadcastStatePaused
+     ]:
     msg_type = data.get('type')
     try:
         msg_type = BroadcastMessageType(msg_type)
@@ -100,10 +154,10 @@ def parse(data):
         state = data.get('state')
         try:
             state = GameStreamState(state)
-            return STATE_MAP[state].load(data)
+            return STATE_MAP[state].parse_obj(data)
         except ValueError:
             raise BroadcastJsonError(
                 'Broadcast message with unknown state: %i - %s' % (state, data)
             )
 
-    return TYPE_MAP[msg_type].load(data)
+    return TYPE_MAP[msg_type].parse_obj(data)

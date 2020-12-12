@@ -1,4 +1,5 @@
-import gevent
+import asyncio
+from typing import Optional
 
 from xbox.nano.enum import ChannelClass
 
@@ -15,7 +16,7 @@ class Client(object):
         self.protocol = None
 
         self._running = False
-        self._loop_thread = None
+        self._loop_task: Optional[asyncio.Task] = None
 
     def open(self, protocol):
         self.protocol = protocol
@@ -31,13 +32,13 @@ class Client(object):
         self.input.close()
 
     def start_loop(self):
-        self._loop_thread = gevent.spawn(self.loop)
+        self._loop_task = asyncio.create_task(self.loop())
 
-    def loop(self):
+    async def loop(self):
         self._running = True
         while self._running:
             self.pump()
-            gevent.sleep(0.1)
+            await asyncio.sleep(0.1)
 
     def pump(self):
         self.video.pump()
