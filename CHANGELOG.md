@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## 0.10.0 (2020-12-12)
+
+* Change of license -> MIT license
+* Deprecated Python 3.6, Added Python 3.9
+* Migration from gevent to asyncio (in sync with smartglass-core)
+* Migration from marshmallow objects to pydantic
+* Fixed controller and closing issues (#15)
+
 ## 0.9.4 (2020-02-29)
 
 * Fix KeyError for debug prints
