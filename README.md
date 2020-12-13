@@ -10,16 +10,16 @@ The gamestreaming part of the smartglass library, codename NANO.
 
 Currently supported version:
 
-* NANO v2
+* NANO v1 (Xbox One family)
 
-XCloud and new XHome streaming are Nano v3!
+XCloud and new XHome streaming are Nano v3, required for Xbox Series S/X.
 
 For in-depth information, check out the documentation: (https://openxbox.github.io)
 
 
 ## Features
 
-* Stream from your local Xbox-family console (Xbox One OG/S/X, Xbox Series S/X)
+* Stream from your local Xbox One (OG/S/X) console
 
 
 ## Dependencies
