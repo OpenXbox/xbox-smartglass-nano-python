@@ -3,4 +3,4 @@
 """Top-level package for xbox-smartglass-nano-python."""
 
 __author__ = """OpenXbox"""
-__version__ = '0.9.4'
+__version__ = '0.10.0'
