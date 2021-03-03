@@ -26,8 +26,8 @@ For in-depth information, check out the documentation: (https://openxbox.github.
 
 * Python >= 3.7
 * xbox-smartglass-core
-* pyav (https://mikeboers.github.io/PyAV/installation.html)
-* pysdl2 (http://pysdl2.readthedocs.io/en/rel_0_9_4/install.html)
+* pyav (https://pyav.org/docs/develop/)
+* pysdl2 (https://pysdl2.readthedocs.io/en/latest/install.html)
 
 
 ## Install
