@@ -1,6 +1,6 @@
 # Run
 xbox-smartglass-core==1.3.0
-av==8.0.2
+av==8.0.3
 PySDL2==0.9.7
 
 # Dev
