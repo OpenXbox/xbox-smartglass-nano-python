@@ -5,7 +5,7 @@ from setuptools import setup, find_namespace_packages
 
 setup(
     name="xbox-smartglass-nano",
-    version="0.10.0",
+    version="0.10.1",
     author="OpenXbox",
     author_email="noreply@openxbox.org",
     description="The NANO (v2) part of the xbox smartglass library",
